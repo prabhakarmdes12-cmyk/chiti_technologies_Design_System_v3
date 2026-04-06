@@ -1123,42 +1123,38 @@
 
         // ── Sidebar Scroll Spy ──
         let isScrolling = false;
-        const sections = document.querySelectorAll('section[id]');
-        const navLinks = document.querySelectorAll('.nav-link');
-        console.log('Scroll Spy: Found', sections.length, 'sections and', navLinks.length, 'nav links');
+        let sections, navLinks, observer;
 
-        const observer = new IntersectionObserver((entries) => {
-            if (isScrolling) return;
-            entries.forEach(entry => {
-                if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
-                    const id = entry.target.getAttribute('id');
-                    console.log('Scroll Spy: Activating section', id);
-                    navLinks.forEach(l => l.classList.remove('active'));
-                    const active = document.querySelector(`.nav-link[href="#${id}"]`);
-                    if (active) {
-                        active.classList.add('active');
-                        console.log('Scroll Spy: Highlighted nav link for', id);
-                    }
-                }
-            });
-        }, { rootMargin: '-80px 0px -30% 0px', threshold: 0.3 });
+        function updateScrollSpy() {
+            // Clear previous active states
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
 
-        // Initialize scroll spy after DOM is fully loaded
-        function initScrollSpy() {
-            sections.forEach(s => observer.observe(s));
-            // Set initial active state based on current scroll position
-            const scrollY = window.scrollY;
-            const viewportHeight = window.innerHeight;
-            sections.forEach(section => {
+            // Find the current section
+            const scrollY = window.scrollY + 100; // Offset for header
+            const currentSection = Array.from(document.querySelectorAll('section[id]')).find(section => {
                 const rect = section.getBoundingClientRect();
                 const sectionTop = rect.top + window.scrollY;
-                if (scrollY >= sectionTop - 100 && scrollY < sectionTop + rect.height - 100) {
-                    const id = section.getAttribute('id');
-                    navLinks.forEach(l => l.classList.remove('active'));
-                    const active = document.querySelector(`.nav-link[href="#${id}"]`);
-                    if (active) active.classList.add('active');
-                }
+                const sectionBottom = sectionTop + rect.height;
+                return scrollY >= sectionTop && scrollY < sectionBottom;
             });
+
+            if (currentSection) {
+                const id = currentSection.getAttribute('id');
+                const activeLink = document.querySelector(`.nav-link[href="#${id}"]`);
+                if (activeLink) {
+                    activeLink.classList.add('active');
+                }
+            }
+        }
+
+        function initScrollSpy() {
+            sections = document.querySelectorAll('section[id]');
+            navLinks = document.querySelectorAll('.nav-link');
+            console.log('Scroll Spy: Initialized with', sections.length, 'sections and', navLinks.length, 'nav links');
+
+            // Use scroll event instead of IntersectionObserver for more reliable detection
+            window.addEventListener('scroll', updateScrollSpy, { passive: true });
+            updateScrollSpy(); // Initial call
         }
 
         // Initialize scroll spy
@@ -1168,23 +1164,25 @@
             initScrollSpy();
         }
 
-        // Prevent observer during manual scroll
-        navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                isScrolling = true;
-                setTimeout(() => isScrolling = false, 1000);
+        // Handle nav link clicks for smooth scrolling
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    const offsetTop = targetSection.offsetTop - 80; // Account for fixed header
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'smooth'
+                    });
+                }
             });
         });
 
-        // Update scroll spy on window load and resize
-        window.addEventListener('load', () => {
-            initScrollSpy();
-        });
-
+        // Update scroll spy on window resize
         window.addEventListener('resize', () => {
-            // Reinitialize observer on resize to handle dynamic content
-            observer.disconnect();
-            sections.forEach(s => observer.observe(s));
+            setTimeout(updateScrollSpy, 100); // Debounce resize events
         });
     </script>
 </body>
