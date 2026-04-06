@@ -1,6 +1,6 @@
 # Chiti Technologies - Unified Design System v3
 
-The proprietary component architecture powering BazaarSetu, NetQ Command, and Project Nova.
+Created by **Prabhakar Kumar**, this proprietary component architecture powers BazaarSetu, NetQ Command, and Project Nova.
 
 ## Features
 
@@ -15,24 +15,48 @@ The proprietary component architecture powering BazaarSetu, NetQ Command, and Pr
 - ✅ Flexible logo system with image support and text fallback
 - ✅ Cross-promotion integration with Chiti Studio agency
 
-## Quick Start
+## Installation
 
-Open `design_system_showcase_v3.html` in any browser.
+Install the React component library: `npm install @chiti/ui`
 
-## Logo Setup
+**Peer Dependencies:** React 18+, React DOM 18+
 
-Place your logo files in the `assets/` folder:
-- `assets/logo.png` or `assets/logo.svg` (recommended)
-- System automatically detects and loads logos with text "C" fallback
+## Usage
 
-## Integration
+```tsx
+import { ChitiButton, ChitiCard } from '@chiti/ui';
 
-This design system is integrated with [Chiti Studio](https://chiti.studio) for full website development services.
+function App() {
+  return (
+    <ChitiCard tilt={true}>
+      <ChitiButton variant="cinematic" audioHapticTick={true}>
+        Click Me
+      </ChitiButton>
+    </ChitiCard>
+  );
+}
+```
 
-## Live Demo
+## For Designers and Developers
 
-https://design.chiti.io
+### Small Teams (1-5 people)
+- Use the live demo for quick prototyping
+- Copy components directly from the showcase
+- Customize tokens in `tokens.css` for branding
+
+### Large Teams (6+ people)
+- Integrate via npm for version control
+- Use the token architecture for consistent theming
+- Leverage the haptic engine for enhanced UX
+- Follow the contributing guide for collaboration
+
+## Links
+
+- **Chiti Studio**: https://portfolio2026-ruby.vercel.app/
+- **Live Demo**: https://chitiusdv30.vercel.app/
+- **NPM Package**: https://www.npmjs.com/package/@chiti/ui
+- **GitHub Repo**: https://github.com/prabhakarmdes12-cmyk/chiti_technologies_Design_System_v3
 
 ---
 
-**Chiti Technologies © 2026**
+**Chiti Technologies © 2026 | Built by Prabhakar Kumar**
