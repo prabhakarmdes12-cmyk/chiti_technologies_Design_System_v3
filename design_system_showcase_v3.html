@@ -1148,6 +1148,8 @@
         }
 
         function updateScrollSpy() {
+            console.log('Scroll spy triggered');
+
             // Clear previous active states
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
 
@@ -1156,23 +1158,30 @@
             const scrollY = window.scrollY;
             const windowHeight = window.innerHeight;
 
-            // Find the section that is most visible in the current viewport
-            let maxVisibleArea = 0;
+            console.log('Found', sections.length, 'sections, scrollY:', scrollY);
+
+            // Find the section that is currently most prominent in the viewport
             let currentSection = null;
+            let maxVisibility = 0;
 
             sections.forEach(section => {
                 const rect = section.getBoundingClientRect();
                 const sectionTop = rect.top + scrollY;
-                const sectionBottom = sectionTop + rect.height;
+                const sectionHeight = rect.height;
 
-                // Calculate visible area of this section
+                // Calculate how much of the section is visible in the viewport
                 const visibleTop = Math.max(scrollY, sectionTop);
-                const visibleBottom = Math.min(scrollY + windowHeight, sectionBottom);
-                const visibleArea = Math.max(0, visibleBottom - visibleTop);
+                const visibleBottom = Math.min(scrollY + windowHeight, sectionTop + sectionHeight);
+                const visibleHeight = Math.max(0, visibleBottom - visibleTop);
 
-                // If this section has more visible area than the current max, make it active
-                if (visibleArea > maxVisibleArea) {
-                    maxVisibleArea = visibleArea;
+                // Calculate visibility ratio
+                const visibilityRatio = visibleHeight / sectionHeight;
+
+                console.log('Section', section.id, '- visibility:', visibilityRatio.toFixed(2));
+
+                // If this section is more visible than the current max, make it active
+                if (visibilityRatio > maxVisibility && visibilityRatio > 0.1) { // At least 10% visible
+                    maxVisibility = visibilityRatio;
                     currentSection = section;
                 }
             });
@@ -1183,8 +1192,12 @@
                 const activeLink = document.querySelector(`.nav-link[href="#${id}"]`);
                 if (activeLink) {
                     activeLink.classList.add('active');
-                    console.log('Active section:', id);
+                    console.log('Set active section:', id, 'with visibility:', maxVisibility.toFixed(2));
+                } else {
+                    console.log('Could not find nav link for section:', id);
                 }
+            } else {
+                console.log('No section found to activate');
             }
         }
 
@@ -1193,10 +1206,20 @@
             navLinks = document.querySelectorAll('.nav-link');
             console.log('Scroll Spy: Initialized with', sections.length, 'sections and', navLinks.length, 'nav links');
 
+            // Test if scroll spy works at all
+            console.log('Testing scroll spy...');
+            updateScrollSpy();
+
             // Use throttled scroll event for better performance
-            const throttledScrollSpy = throttle(updateScrollSpy, 100);
+            const throttledScrollSpy = throttle(updateScrollSpy, 200); // Increased throttle for testing
             window.addEventListener('scroll', throttledScrollSpy, { passive: true });
-            updateScrollSpy(); // Initial call
+            console.log('Scroll event listener added');
+
+            // Also add a test click handler
+            document.addEventListener('click', () => {
+                console.log('Page clicked - testing scroll spy');
+                updateScrollSpy();
+            });
         }
 
         // Initialize scroll spy
